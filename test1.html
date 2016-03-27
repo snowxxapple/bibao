@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+	<title>变量预解析 函数预解析</title>
+</head>
+<body>
+
+</body>
+<script type="text/javascript">
+	//变量预解析 即变量声明提前
+	console.log(a,'预解析');//undefined js解析器会把变量声明提前，var a，其他语言是不可以这样的，会报错
+	var a=10;//其实是先进行var a声明，在进行变量赋值
+	console.log(a,'声明后赋值');//10 声明后的变量赋值
+	//函数预解析 
+	//1  函数声明方式声明函数 整个声明都会提前
+	var a=10;
+	console.log(fn,'函数声明方式 整个声明函数提前');//因此声明方式的函数 即便函数调用在函数体之前也是可以的
+	function fn(){
+		console.log(a,'函数内部预解析 ');//undefined 相当于var a;是函数内部的局部变量预解析,预解析只会在当前函数作用域内
+		var a=20;
+		console.log(a,'函数内部声明后赋值');//20
+	}
+	console.log(fn,'声明方式');
+	//2 函数表达式
+	console.log(fn1,'只有var fn');
+	var fn1=function(){
+
+	}
+	console.log(fn1,'函数表达式赋值后');
+
+   //闭包 函数嵌套函数，内部函数可以访问外部函数的变量
+   //demo1
+   function A(){
+   	var a=1;
+   	function B(){
+   		console.log(a,'闭包demo1');
+   	}
+   	return B;//在A中返回B的引用
+   }
+   var c=A();//当一个内部函数被其外部函数之外的变量引用时，就形成了一个闭包
+   c();
+   //demo1:js中GC机制（垃圾回收机制）:如果一个对象不再被引用，那么这个对象就会被GC回收，否则这个对象会一直保存在内存中.demo1中,函数B在A中，因此B依赖于A，而变量c引用了函数B，因此c也就间接的引用了A，所以A在内存中并不会被GC回收，会一直保存在内存中.
+
+   //demo2
+   function C(){
+   	var count=0;
+   	function D(){
+   		count=count+1;
+   		console.log(count,'demo2');
+   	}
+   	return D;
+   }
+   var d=C();//实质上式变量c引用函数B
+   d();//1 dount的值一直保存在内存中
+   d();//2
+   d();//3
+   //demo2:A的作用域链被销毁，但是活动对象热然不会销毁：count变量和B一直都在内存中,B每执行一次，count的值就会加1.闭包的作用：需要一个模块中定义一个这样的变量，希望这个变量一直保存在内存中，但又不会污染全局变量，可以用闭包的方式来定义这个模块
+
+   //demo3 
+   function E(){
+   	var count=0;
+   	function F(){
+   		count++;
+   		console.log(count,'demo3');
+   	}
+   	return F;
+   }
+   var e=E();
+   e();//1
+   e();//2
+   e();//3
+   e=null;//解除对B的引用，A中声明的变量count被销毁
+   e=E();
+   e();//1
+</script>
+</html>
